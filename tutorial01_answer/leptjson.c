@@ -8,6 +8,7 @@ typedef struct {
     const char* json;
 }lept_context;
 
+//跳过空白
 static void lept_parse_whitespace(lept_context* c) {
     const char *p = c->json;
     while (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')
@@ -18,10 +19,10 @@ static void lept_parse_whitespace(lept_context* c) {
 static int lept_parse_true(lept_context* c, lept_value* v) {
     EXPECT(c, 't');
     if (c->json[0] != 'r' || c->json[1] != 'u' || c->json[2] != 'e')
-        return LEPT_PARSE_INVALID_VALUE;
+        return LEPT_PARSE_INVALID_VALUE;//如果不是这三种字面值
     c->json += 3;
-    v->type = LEPT_TRUE;
-    return LEPT_PARSE_OK;
+    v->type = LEPT_TRUE;如果遇到true
+    return LEPT_PARSE_OK;返回0
 }
 
 static int lept_parse_false(lept_context* c, lept_value* v) {
@@ -47,15 +48,15 @@ static int lept_parse_value(lept_context* c, lept_value* v) {
         case 't':  return lept_parse_true(c, v);
         case 'f':  return lept_parse_false(c, v);
         case 'n':  return lept_parse_null(c, v);
-        case '\0': return LEPT_PARSE_EXPECT_VALUE;
-        default:   return LEPT_PARSE_INVALID_VALUE;
+        case '\0': return LEPT_PARSE_EXPECT_VALUE;//如果一个json只有空白
+        default:   return LEPT_PARSE_INVALID_VALUE;//若是其他字符
     }
 }
 
 int lept_parse(lept_value* v, const char* json) {
     lept_context c;
     int ret;
-    assert(v != NULL);
+    assert(v != NULL);//如果其值为假，先向stderr打印错误信息，然后终止
     c.json = json;
     v->type = LEPT_NULL;
     lept_parse_whitespace(&c);
